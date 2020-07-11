@@ -10,6 +10,7 @@ setuptools.setup(
     author_email="magnus@massivemonster.org",
     license='Apache License 2.0',
     description="A small utiltity script to count frequencies of words in a text file including options to stem,remove uoms, remove numerics, remove decimals, lemmitization ",
+    url = "https://github.com/magsv/wordfreq",
     packages=setuptools.find_packages(),
     install_requires=[
         'nltk>=3.5',
