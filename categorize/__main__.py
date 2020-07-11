@@ -61,10 +61,17 @@ def create_folderpath_if_not_exists(dirname):
 @click.option('--logfile',
               help='The full path logfile to use',
               required=True)
-
-def categorizetext(inputfile,resultfile,additional_stopwords,logfile):
+@click.option('--lemmetize', is_flag=True,default=False,help='If specifified runs lemmetization on words')
+@click.option('--stem', is_flag=True,default=False,help='If specified runs stemming on words')
+@click.option('--numerics', is_flag=True,default=False,help='If specified tries to remove numerics')
+@click.option('--uoms', is_flag=True,default=False,help='If specified tries to remove uom e.g. m3')
+@click.option('--singlechars', is_flag=True,default=False,help='If specified removes singlechars')
+@click.option('--decimals', is_flag=True,default=False,help='If specified removes decimals')
+def categorizetext(inputfile,resultfile,additional_stopwords,logfile,
+lemmetize,stem,numerics,uoms,singlechars,decimals):
     initialize_logging(logfile)
-    futils.categorizetext(inputfile,resultfile,additional_stopwords)
+    futils.categorizetext(inputfile,resultfile,additional_stopwords,
+    lemmetize,stem,numerics,uoms,singlechars,decimals)
 
 
 

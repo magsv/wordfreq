@@ -3,7 +3,6 @@ import glob
 import os
 import shutil
 import click
-import os.path
 import nltk
 import csv
 from os import path
@@ -11,7 +10,6 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-import matplotlib.pyplot as plt
 
 def remove_uoms(words):
     """
@@ -29,9 +27,11 @@ def remove_uoms(words):
 
     returnWords=[]
     for word in words:
-        if word[0:len(word)-1].isnumeric()==False:
+        word=word.replace('.', '', 1)
+        word=word.replace(',', '', 1)
+        if word[0:len(word)-1].isnumeric()==False and word[0:len(word)-1].isdecimal()==False:
             #we do not have a match on e.g. 1543m 
-            if word[0:len(word)-2].isnumeric()==False:
+            if word[0:len(word)-2].isnumeric()==False and word[0:len(word)-2].isdecimal()==False:
                 #we do not have a match on e.g. 1543m3
                 #add it
                 returnWords.append(word)
@@ -79,7 +79,7 @@ def remove_decimals(words):
     -------
     Processed list of words where decimals have been removed
     """
-    return [word for word in words if not word.isdecimal()]
+    return [word for word in words if not '.' in word and not ',' in word]
 
 def lowercase_words(words):
     """
@@ -229,13 +229,29 @@ def read_lines_from_file(inputfile):
     return lines
 
 
-def categorizetext(inputfile,resultfile,additional_stopwords):
+def categorizetext(inputfile,resultfile,additional_stopwords,
+lemmetize=True,stem=True,numerics=True,uoms=True,singlechars=True,
+decimals=False):
     txt=read_text_from_file(inputfile)
-    tokenized_text=tokenize_and_remove_stopwords(txt,additional_stopwords)
-    words=remove_single_char_tokens(tokenized_text)
-    words=remove_numerics(words)
-    words=remove_uoms(words)
-    words=lemmentize_words(words)
+    words=tokenize_and_remove_stopwords(txt,additional_stopwords)
+    if singlechars:
+        logging.info('Running removale of single chars')
+        words=remove_single_char_tokens(words)
+    if decimals:
+        logging.info('Running removal of decimals')
+        words=remove_decimals(words)
+    if numerics:
+        logging.info('Running removal of numerics')
+        words=remove_numerics(words)
+    if uoms:
+        logging.info('Running removal of uoms')
+        words=remove_uoms(words)
+    if lemmetize:
+        logging.info('Running lemmitization')
+        words=lemmentize_words(words)
+    if stem:
+        logging.info('Running stemming')
+        words=stem_words(words)
     freq=count_frequency(words)
     write_frequency(resultfile,freq)
     print ("Wrote file to:"+resultfile)
